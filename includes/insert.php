@@ -9,25 +9,25 @@ $form_data = json_decode(file_get_contents("php://input"));
 $error = '';
 $message = '';
 $validation_error = '';
-$first_name = '';
-$last_name = '';
+$name = '';
+$charge = '';
 
 if($form_data->action == 'fetch_single_data')
 {
-	$query = "SELECT * FROM tbl_sample WHERE id='".$form_data->id."'";
+	$query = "SELECT * FROM user WHERE id='".$form_data->id."'";
 	$statement = $connect->prepare($query);
 	$statement->execute();
 	$result = $statement->fetchAll();
 	foreach($result as $row)
 	{
-		$output['first_name'] = $row['first_name'];
-		$output['last_name'] = $row['last_name'];
+		$output['name'] = $row['name'];
+		$output['charge'] = $row['charge'];
 	}
 }
 elseif($form_data->action == "Delete")
 {
 	$query = "
-	DELETE FROM tbl_sample WHERE id='".$form_data->id."'
+	DELETE FROM user WHERE id='".$form_data->id."'
 	";
 	$statement = $connect->prepare($query);
 	if($statement->execute())
@@ -37,22 +37,22 @@ elseif($form_data->action == "Delete")
 }
 else
 {
-	if(empty($form_data->first_name))
+	if(empty($form_data->name))
 	{
 		$error[] = 'First Name is Required';
 	}
 	else
 	{
-		$first_name = $form_data->first_name;
+		$name = $form_data->name;
 	}
 
-	if(empty($form_data->last_name))
+	if(empty($form_data->charge))
 	{
 		$error[] = 'Last Name is Required';
 	}
 	else
 	{
-		$last_name = $form_data->last_name;
+		$charge = $form_data->charge;
 	}
 
 	if(empty($error))
@@ -60,13 +60,13 @@ else
 		if($form_data->action == 'Insert')
 		{
 			$data = array(
-				':first_name'		=>	$first_name,
-				':last_name'		=>	$last_name
+				':name'		=>	$name,
+				':charge'		=>	$charge
 			);
 			$query = "
-			INSERT INTO tbl_sample 
-				(first_name, last_name) VALUES 
-				(:first_name, :last_name)
+			INSERT INTO user 
+				(name, charge) VALUES 
+				(:name, :charge)
 			";
 			$statement = $connect->prepare($query);
 			if($statement->execute($data))
@@ -77,13 +77,13 @@ else
 		if($form_data->action == 'Edit')
 		{
 			$data = array(
-				':first_name'	=>	$first_name,
-				':last_name'	=>	$last_name,
+				':name'	=>	$name,
+				':charge'	=>	$charge,
 				':id'			=>	$form_data->id
 			);
 			$query = "
-			UPDATE tbl_sample 
-			SET first_name = :first_name, last_name = :last_name 
+			UPDATE user 
+			SET name = :name, charge = :charge 
 			WHERE id = :id
 			";
 
